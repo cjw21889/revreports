@@ -58,3 +58,24 @@ pypi_test:
 
 pypi:
 	@twine upload dist/* -u lologibus2
+
+# ----------------------------------
+#      GCP Commands
+# ----------------------------------
+LOCAL_PATH = nov22.csv
+BUCKET_NAME = revreports
+BUCKET_FOLDER = actuals_20
+PROJECT_ID = revreports
+TOTAL_ACCTUALS = actuals_2020.csv
+CURRENT_ACCTUALS = actuals_2020.csv
+
+upload_data:
+	# -@gsutil cp train_1k.csv gs://wagon-ml-my-bucket-name/data/train_1k.csv
+	-@gsutil cp ${LOCAL_PATH} gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${UPLOADED_FILE_NAME}
+
+merge_actuals:
+	-@gsutil compose gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${TOTAL_ACCTUALS} gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${LOCAL_PATH} gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${TOTAL_ACCTUALS}
+	@echo gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${TOTAL_ACCTUALS}
+	@echo gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${LOCAL_PATH}
+
+

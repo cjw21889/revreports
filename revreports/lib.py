@@ -25,10 +25,10 @@ def convert_seg_stat(date):
 
 def convert_seg_res(date):
     df = pd.read_csv('../revreports/data/11_23_20/segment_res.txt', sep="\t",
-                 usecols=['RESERVATION_DATE', 'MARKET_CODE', 'NO_DEFINITE_ROOMS', 'TOTAL_REVENUE'],
+                 usecols=['RESERVATION_DATE', 'MARKET_CODE', 'TOTAL_REVENUE','PRINT_NO_OF_ROOMS' ],
                 engine='python', skipfooter=2)#, parse_dates=['RESERVATION_DATE'])
 
-    df.columns = ['Date', 'Code', 'Res', 'Rev']
+    df.columns = ['Date', 'Code', 'Rev', 'Res']
     # where do these get saved
     df.to_csv(date, index=False)
 
@@ -45,12 +45,13 @@ def convert_source_stat(date):
 
 def convert_source_res(date):
     df = pd.read_csv('../revreports/data/11_23_20/segment_res.txt', sep="\t",
-                 usecols=['RESERVATION_DATE', 'MARKET_CODE', 'NO_DEFINITE_ROOMS', 'TOTAL_REVENUE'],
+                 usecols=['RESERVATION_DATE', 'MARKET_CODE', 'TOTAL_REVENUE','PRINT_NO_OF_ROOMS'],
                 engine='python', skipfooter=2)#, parse_dates=['RESERVATION_DATE'])
 
-    df.columns = ['Date', 'Code', 'Res', 'Rev']
+    df.columns = ['Date', 'Code', 'Rev', 'Res']
     # where do these get saved
     df.to_csv(date, index=False)
+
 
 
 
