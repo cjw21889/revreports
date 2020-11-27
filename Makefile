@@ -75,7 +75,6 @@ upload_data:
 
 merge_actuals:
 	-@gsutil compose gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${TOTAL_ACCTUALS} gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${LOCAL_PATH} gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${TOTAL_ACCTUALS}
-	@echo gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${TOTAL_ACCTUALS}
-	@echo gs://${BUCKET_NAME}/${BUCKET_FOLDER}/${LOCAL_PATH}
+
 
 

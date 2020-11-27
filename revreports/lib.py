@@ -6,31 +6,42 @@
 from os.path import split
 import pandas as pd
 import datetime
+import revreports
+# import pdb; pdb.set_trace()
 
 ACTUALS = '../revreports/data/Actuals/2020_seg'
+TODAY = datetime.datetime.today().strftime('%m-%d-%y')
 
-pd.set_option('display.width', 200)
-
-
-def convert_seg_stat(date):
+def convert_seg_stat(date = TODAY):
     # need file name and date to add to report
-    file_date = date.replace('/', '_')
-    df = pd.read_csv(f'../revreports/data/stat/segment_stat_{file_date}.txt', sep="\t", engine='python', skipfooter=2,
+    '''Enter date as format mm-dd-yy '''
+    file_date = date.replace('-', '_')
+    folder_source, _ = split(revreports.__file__)
+    df = pd.read_csv(f'{folder_source}/data/{file_date}/segment_stat.txt', sep="\t", engine='python', skipfooter=2,
                  usecols=['GRP2_CODE', 'ROOMS_DAY', 'ROOM_REV_DAY'])
 
     df.columns = ['Code', 'Res', 'Rev']
     df['Date'] = date
-    df.to_csv(actuals, mode='a', header=False, index=False)
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Date'] = df['Date'] - pd.DateOffset(1)
+    df = df[['Date', 'Code', 'Rev', 'Res']]
+    file = f'{folder_source}/data/seg_stat_{file_date}.csv'
+    df.to_csv(file, header=False, index=False)
+    return file
 
 
-def convert_seg_res(date):
-    df = pd.read_csv('../revreports/data/11_23_20/segment_res.txt', sep="\t",
+def convert_seg_res(date = TODAY):
+    file_date = date.replace('-', '_')
+    folder_source, _ = split(revreports.__file__)
+
+    df = pd.read_csv(f'{folder_source}/data/{file_date}/segment_res.txt', sep="\t",
                  usecols=['RESERVATION_DATE', 'MARKET_CODE', 'TOTAL_REVENUE','PRINT_NO_OF_ROOMS' ],
-                engine='python', skipfooter=2)#, parse_dates=['RESERVATION_DATE'])
+                engine='python', skipfooter=2, parse_dates=['RESERVATION_DATE'])
 
     df.columns = ['Date', 'Code', 'Rev', 'Res']
-    # where do these get saved
-    df.to_csv(date, index=False)
+    file = f'{folder_source}/data/seg_res.{file_date}.csv'
+    df.to_csv(file, index=False)
+    return file
 
 
 def convert_source_stat(date):

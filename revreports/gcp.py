@@ -21,7 +21,45 @@ def download_from_gcp():
     blob = client.blob(storage_location)
     blob.download_to_filename('actuals.csv')
 
+def upload_res(file, date, bucket=BUCKET_NAME, rm=False):
+    client = storage.Client().bucket(bucket)
+    storage_location = 'OTB_20/{}/{}'.format(date,
+        'seg_res')
+    blob = client.blob(storage_location)
+    blob.upload_from_filename(file)
+    print("=> res report uploaded to gs://{}/{}".format(BUCKET_NAME, storage_location))
+    if rm:
+        os.remove(file)
+        print('file removed from local drive')
 
+def merge_stat(file, date, bucket=BUCKET_NAME, rm=False):
+    # setup client
+    client = storage.Client().bucket(bucket)
+    # hardcoded temp stat file - and upload it
+    storage_location = 'actuals_20/seg_stat'
+    blob = client.blob(storage_location)
+    blob.upload_from_filename(file)
+    location = "gs://{}/{}".format(BUCKET_NAME, storage_location)
+    print("=> stat report uploaded to {}".format(location))
+
+    # remove it locally
+    if rm:
+        os.remove(file)
+        print('file removed from local drive')
+
+    # hard coded running actuals for the year
+    full_blob = client.blob("actuals_20/actuals_2020.csv")
+    # set them in a list
+    sources = [full_blob, blob]
+
+    # set up destination to override running actuals after it merges with temp file
+    destination = client.blob("actuals_20/actuals_2020.csv")
+    destination.content_type = "text/csv"
+    destination.compose(sources)
+
+    # delet temp file from gcp
+    blob.delete()
+    print('actuals merged on gcp')
 
 if __name__ == '__main__':
     download_from_gcp()

@@ -5,23 +5,80 @@
 from os.path import split
 import argparse
 import pandas as pd
+import datetime
 
 # Import from revreports
 import revreports
-from revreports.lib import clean_data
+from revreports.lib import convert_seg_res, convert_seg_stat
+from revreports.gcp import upload_res, merge_stat
+
+
 
 if __name__ == '__main__':
     usage = '%(prog)s'
-    description = 'revreports_description'
+    description = '''Defaults to today's date for file conversion, use -d followed by
+          desired date to process in format dd-mm-yy'''
     # https://docs.python.org/3/library/argparse.html
     # https://docs.python.org/3/howto/argparse.html
     parser = argparse.ArgumentParser(description=description, usage=usage)
+    parser.add_argument('-d', dest='date',
+                        help='Format dd-mm-yy, ensure the relevent dirtory exists and has the required files',
+                        default = datetime.datetime.today().strftime('%m-%d-%y'))
+
+    parser.add_argument('--res',
+                        help='only processes res report',
+                        action='store_const',
+                        const=True,
+                        default=False,
+                        required=False)
+
+    parser.add_argument('--stat',
+                        help='only processes stat report',
+                        action='store_const',
+                        const=True,
+                        default=False,
+                        required=False)
+
+    parser.add_argument('--local',
+                        help='Use local to prevent GCP upload and save files locally on computer',
+                        action='store_const',
+                        const=True,
+                        default=False,
+                        required=False)
+
+    parser.add_argument('--rm',
+                        help='Use remove to delete local copy of converted file after GCP upload',
+                        action='store_const',
+                        const=True,
+                        default=False,
+                        required=False)
+
     args = parser.parse_args()
     folder_source, _ = split(revreports.__file__)
-    df = pd.read_csv('{}/data/data.csv.gz'.format(folder_source))
-    print('  revreports/data/data.csv.gz Loaded')
+    if args.stat:
+        print('converting stat report')
+        stat_file = convert_seg_stat(args.date)
+        if not args.local:
+            merge_stat(stat_file, args.date, rm=args.rm)
+        else:
+            print(f'stored locally at {folder_source}/data')
+    elif args.res:
+        res_file = convert_seg_res(args.date)
+        print('converting res report')
+        if not args.local:
+            print('uploading res report')
+            upload_res(res_file, args.date, rm=args.rm)
+        else:
+            print(f'stored locally at {folder_source}/data')
+    else:
+        print('converting stat report')
+        stat_file = convert_seg_stat(args.date)
+        print('converting res report')
+        res_file = convert_seg_res(args.date)
+        if not args.local:
+            merge_stat(stat_file, args.date, rm=args.rm)
+            print('uploading res report')
+            upload_res(res_file, args.date, rm=args.rm)
+        else:
+            print(f'stored locally at {folder_source}/data')
 
-    res = clean_data(df)
-    res.to_csv('out.csv', index=False)
-    print('==> out.csv MADE ')
-    print('    shape is {}'.format(res.shape))
