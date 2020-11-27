@@ -10,3 +10,7 @@ yapf
 python-gitlab
 twine
 xlrd
+streamlit
+s3fs
+google-cloud-storage
+

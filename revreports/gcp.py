@@ -13,13 +13,14 @@ def get_credentials():
     creds_gcp = service_account.Credentials.from_service_account_info(creds_json)
     return creds_gcp
 
-def download_from_gcp():
+def download_from_gcp(files):
+    '''end a dictionary with gcp location as key and local dest as value '''
     creds = get_credentials()
     client = storage.Client(credentials=creds, project=PROJECT_ID).bucket(BUCKET_NAME)
-    storage_location = 'actuals_20/actuals_2020.csv'
-
-    blob = client.blob(storage_location)
-    blob.download_to_filename('actuals.csv')
+    # iterate through file dictionary and save each needed file
+    for k,v in files.items():
+        blob = client.blob(k)
+        blob.download_to_filename(v)
 
 def upload_res(file, date, bucket=BUCKET_NAME, rm=False):
     client = storage.Client().bucket(bucket)
@@ -62,4 +63,8 @@ def merge_stat(file, date, bucket=BUCKET_NAME, rm=False):
     print('actuals merged on gcp')
 
 if __name__ == '__main__':
-    download_from_gcp()
+    download_from_gcp(files = {'actuals_20/actuals_2020.csv': 'actuals.csv',
+                                'OTB_20/11-23-20/seg_res': 'otb-11-23.csv',
+                                'OTB_20/11-26-20/seg_res': 'otb-11-26.csv',
+                                'OTB_20/11-27-20/seg_res': 'otb-11-27.csv'})
+
