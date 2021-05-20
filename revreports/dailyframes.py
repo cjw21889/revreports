@@ -1,9 +1,7 @@
 import pandas as pd
-from calendar import monthrange
 pd.set_option('use_inf_as_na', True)
 from revreports.params import CODES, ROOMCOUNT, MONTHS
-
-
+from revreports.utils import dollar_format, occ_format, get_monthly_occ
 
 
 def create_pickup(df1, df2):
@@ -17,7 +15,8 @@ def create_pickup(df1, df2):
 
 
 def create_day_view(df):
-    df = df.groupby('Date', as_index=True)['Res', 'Rev', 'Res p/u', 'Rev p/u'].sum()
+    df = df.groupby('Date', as_index=True)[['Res', 'Rev', 'Res p/u', 'Rev p/u']].sum()
+    df.index = df.index.strftime('%A - %m/%d')
     df['ADR p/u'] = df['Rev p/u'] / df['Res p/u']
     df['ADR'] = df.Rev / df.Res
     df['Occ'] = 100 * (df.Res / ROOMCOUNT)
@@ -26,23 +25,24 @@ def create_day_view(df):
     df = df.round(0)
 
     df = df[['Occ','Res', 'ADR', 'Rev', '|', 'Res p/u', 'ADR p/u','Rev p/u']]
-
+    df['Occ'] = df['Occ'].apply(occ_format)
+    for col in ['ADR', 'Rev', 'ADR p/u', 'Rev p/u']:
+        df[col] = df[col].apply(dollar_format)
 
     return df
 
-def create_month_view(df):
-    # df['Month'] = pd.to_datetime(df.Date, format='%B')
-    df = df.groupby(df.Date.dt.month, as_index=False)['Res', 'Rev', 'Res p/u', 'Rev p/u'].sum()
+
+def create_month_view(df, year):
+    df = df.groupby(df.Date.dt.month, as_index=False)[['Res', 'Rev', 'Res p/u', 'Rev p/u']].sum()
     df['Month'] = list(MONTHS.keys())
-    # df = df.reset_index('Month')
     df['ADR'] = df.Rev / df.Res
     df['ADR p/u'] = df['Rev p/u'] / df['Res p/u']
     df['|'] = '|'
-    # df['Occ'] = df.Res / (monthrange(df.Date.dt.year, df.Date.dt.month) * ROOMCOUNT)
+    df['Occ'] = df.apply(lambda x: get_monthly_occ(x, year), axis=1)
     df = df.fillna(0)
-    df = df[['Month', 'Res', 'ADR', 'Rev', '|', 'Res p/u', 'ADR p/u', 'Rev p/u']]
-    df = df.round(2)
-
-
+    df = df[['Month', 'Occ','Res', 'ADR', 'Rev', '|', 'Res p/u', 'ADR p/u', 'Rev p/u']].set_index('Month')
+    df['Occ'] = df['Occ'].apply(occ_format)
+    for col in ['ADR', 'Rev', 'ADR p/u', 'Rev p/u']:
+        df[col] = df[col].apply(dollar_format)
     return df
 

@@ -13,5 +13,5 @@ setup(name='revreports',
       install_requires=requirements,
       # include_package_data: to install data from MANIFEST.in
       include_package_data=True,
-      scripts=['scripts/revreports-run'],
+      scripts=['scripts/revreports-run','scripts/revreports-download'],
       zip_safe=False)

@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys, os
+import argparse
+import pandas as pd
+import datetime
+
+# Import from revreports
+import revreports
+from revreports.lib import convert_seg_res, convert_seg_stat
+from revreports.gcp import download_from_gcp
+
+
+
+if __name__ == '__main__':
+    usage = '%(prog)s'
+    description = '''Defaults to today's date for file conversion, use -d followed by
+          desired date to process in format dd-mm-yy'''
+    # https://docs.python.org/3/library/argparse.html
+    # https://docs.python.org/3/howto/argparse.html
+    parser = argparse.ArgumentParser(description=description, usage=usage)
+    parser.add_argument('-d', dest='date',
+                        help='Format dd-mm-yy, ensure the relevent dirtory exists and has the required files',
+                        default = datetime.datetime.today().strftime('%m-%d-%y'))
+
+    parser.add_argument('--res',
+                        help='only download res report',
+                        action='store_const',
+                        const=True,
+                        default=False,
+                        required=False)
+
+    parser.add_argument('--act',
+                        help='only download current actuals report, no date required',
+                        action='store_const',
+                        const=True,
+                        default=False,
+                        required=False)
+
+
+
+    args = parser.parse_args()
+    files = {'actuals_20/actuals_2020.csv': 'actuals.csv'}
+    location = os.getcwd()
+    if args.act:
+        print("downloading actuals report")
+        download_from_gcp(files)
+        print(f"actuals stored locally at {location}/actuals.csv")
+    elif args.res:
+        files = {f"OTB_20/{args.date}/seg_res": f"{args.date}.csv"}
+        print(f"downloading res report for {args.date}")
+        download_from_gcp(files)
+        print(f"OTB stored locally at {location}.{args.date}.csv")
+    else:
+        print("downloading reports")
+        files[f"OTB_20/{args.date}/seg_res"] = f"{args.date}.csv"
+        download_from_gcp(files)
+        print(f"actuals stored locally at {location}/actuals.csv")
+        print(f"OTB stored locally at {location}/{args.date}.csv")
+

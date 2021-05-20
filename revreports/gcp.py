@@ -22,6 +22,7 @@ def download_from_gcp(files):
         blob = client.blob(k)
         blob.download_to_filename(v)
 
+
 def upload_res(file, date, bucket=BUCKET_NAME, rm=False):
     client = storage.Client().bucket(bucket)
     storage_location = 'OTB_20/{}/{}'.format(date,
@@ -63,8 +64,5 @@ def merge_stat(file, date, bucket=BUCKET_NAME, rm=False):
     print('actuals merged on gcp')
 
 if __name__ == '__main__':
-    download_from_gcp(files = {'actuals_20/actuals_2020.csv': 'actuals.csv',
-                                'OTB_20/11-23-20/seg_res': 'otb-11-23.csv',
-                                'OTB_20/11-26-20/seg_res': 'otb-11-26.csv',
-                                'OTB_20/11-27-20/seg_res': 'otb-11-27.csv'})
-
+    # download_from_gcp(files = {'actuals_20/actuals_2020.csv': 'actuals.csv','OTB_20/11-23-20/seg_res': 'otb-11-23.csv','OTB_20/11-26-20/seg_res': 'otb-11-26.csv','OTB_20/11-27-20/seg_res': 'otb-11-27.csv'})
+    pass
