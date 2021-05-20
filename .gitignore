@@ -9,6 +9,5 @@ dist/
 groupama/data/base_pno.*
 .DS_Store
 .idea/
-*.csv
 revreports/data/*
 *.xlsx
