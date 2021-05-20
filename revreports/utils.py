@@ -1,5 +1,6 @@
 import pandas as pd
 from calendar import monthrange
+from revreports.params import ROOMCOUNT
 
 
 def dollar_format(x):
