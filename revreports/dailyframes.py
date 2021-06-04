@@ -46,3 +46,7 @@ def create_month_view(df, year):
         df[col] = df[col].apply(dollar_format)
     return df
 
+
+def create_matrix(df):
+    
+    return df
