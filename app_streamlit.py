@@ -11,7 +11,7 @@ TODAY = datetime.datetime.today()
 
 
 def main():
-    view = st.sidebar.selectbox("chose report", ["Monthly Segments", "Daily Pickup", "Matrix"])
+    view = st.sidebar.selectbox("Choose Report:", ["Monthly Segments", "Daily Pickup", "Matrix"])
 
     actuals, current_df, yesterday_df, past_df = get_data()
 
@@ -41,7 +41,7 @@ def main():
 
         day_df = pickup_df[(pickup_df.Date.dt.month == month) & (pickup_df.Date.dt.year == year)]
 
-        st.subheader('Current On The Books by Month')
+        st.subheader('Current On The Books by Day')
 
         day_df = create_day_view(day_df)
 
