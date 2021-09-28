@@ -19,13 +19,13 @@ def main():
     st.header('Arlo Hotels')
     if view == 'Daily Pickup':
         st.write('Select Data:')
-        col1, col2 = st.beta_columns(2)
+        col1, col2, col3 = st.beta_columns(3)
         with col1:
             st.date_input('As of:', value=pd.to_datetime('11/30/20'))
-            year = st.selectbox('Year:', [2019, 2020, 2021], index=2)
         with col2:
             length = st.selectbox('Pickup Length:', [1,7])
-            month = MONTHS[st.selectbox('Month:', list(MONTHS.keys()), index = TODAY.month - 6 )]
+        with col3:
+            year = st.selectbox('Year:', [2019, 2020, 2021], index=2)
 
         if length == 1:
           pickup_df = create_pickup(current_df, yesterday_df)
@@ -38,6 +38,9 @@ def main():
         st.subheader('Current On The Books by Month')
         st.dataframe(current_year.astype('object'), width=800, height=500)
 
+        col1, col2, col3 = st.beta_columns(3)
+        with col1:
+            month = MONTHS[st.selectbox('Month:', list(MONTHS.keys()), index = TODAY.month - 6 )]
 
         day_df = pickup_df[(pickup_df.Date.dt.month == month) & (pickup_df.Date.dt.year == year)]
 
@@ -83,6 +86,7 @@ def main():
         st.write('Work in Progress')
         year = st.selectbox('Year', [2019, 2020, 2021], index=2)
         month = MONTHS[st.selectbox('Month', list(MONTHS.keys()), index = TODAY.month - 6)]
+        st.write('<style> div.row-widget.stRadio > div{flex-direction: row} < /style >', unsafe_allow_html=True)
         data = st.radio('Select View',
                              ('On The Books', '1 Day P/U', '7 Day P/U', 'Pace', 'Vs. Budget', 'Vs. Forecast'))
         condensed = st.checkbox('Condensed Segment View')
