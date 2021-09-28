@@ -9,6 +9,7 @@ from revreports.fetch import get_data
 
 TODAY = datetime.datetime.today()
 
+st.set_page_config(page_icon='icon.png', layout='wide')
 
 def main():
     view = st.sidebar.selectbox("Choose Report:", ["Monthly Segments", "Daily Pickup", "Matrix"])
